@@ -22,6 +22,9 @@ public interface GrowattFeignClient {
 	@GetMapping("/selectPlant/getBusiness") 
 	void getBusiness();
 	
+	@PostMapping(value = "/indexbC/getTotalData", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	TotalDataResponse getTotalData(EnergyRequest energyRequest);
+	
 	@PostMapping(value = "/indexbC/inv/getInvTotalData", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	TotalDataResponse getInvTotalData(@RequestBody EnergyRequest request);
 	
@@ -33,5 +36,4 @@ public interface GrowattFeignClient {
 	
 	@PostMapping(value = "/indexbC/inv/getInvEnergyDayChart", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	DayResponse getInvEnergyDayChart(@RequestBody EnergyRequest request);
-
 }
