@@ -1,4 +1,4 @@
-package de.blafoo.growatt.feign;
+package de.blafoo.bkw.growatt.feign;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package de.blafoo.views.bkw;
+package de.blafoo.bkw.views.bkw;
 
 /**
  * Simple DTO class for the inbox list to demonstrate complex object data

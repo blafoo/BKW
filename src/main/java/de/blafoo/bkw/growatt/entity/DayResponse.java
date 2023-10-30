@@ -1,4 +1,4 @@
-package de.blafoo.growatt.entity;
+package de.blafoo.bkw.growatt.entity;
 
 import java.util.List;
 
@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class YearResponse {
+public class DayResponse {
 	
+	/** Status of query: 1 == ok */
 	private Long result;
+	
 	private Obj obj;
 
 	@Getter
@@ -19,8 +21,8 @@ public class YearResponse {
 	@AllArgsConstructor
 	public class Obj {
 		
-		private List<Double> energy;
-
+		/** Power production for each 5 minute interval of the day, in total 288 values */
+		private List<Double> pac;
 	}
 	
 }

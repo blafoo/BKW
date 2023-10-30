@@ -1,4 +1,4 @@
-package de.blafoo.views.bkw;
+package de.blafoo.bkw.views.bkw;
 
 
 import com.vaadin.flow.component.Component;
@@ -27,8 +27,9 @@ import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import de.blafoo.views.MainLayout;
-import de.blafoo.views.bkw.ServiceHealth.Status;
+
+import de.blafoo.bkw.views.MainLayout;
+import de.blafoo.bkw.views.bkw.ServiceHealth.Status;
 
 @PageTitle("Bkw")
 @Route(value = "bkw", layout = MainLayout.class)

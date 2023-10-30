@@ -1,4 +1,4 @@
-package de.blafoo.views;
+package de.blafoo.bkw.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -11,8 +11,10 @@ import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import de.blafoo.views.about.AboutView;
-import de.blafoo.views.bkw.BkwView;
+
+import de.blafoo.bkw.views.about.AboutView;
+import de.blafoo.bkw.views.bkw.BkwView;
+
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
