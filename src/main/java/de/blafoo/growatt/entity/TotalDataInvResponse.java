@@ -1,6 +1,4 @@
-package de.blafoo.bkw.growatt.entity;
-
-import java.util.List;
+package de.blafoo.growatt.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthResponse {
-	
-	/** Status of query: 1 == ok */
+public class TotalDataInvResponse {
+
 	private Long result;
-	
 	private Obj obj;
 
 	@Getter
@@ -21,9 +17,8 @@ public class MonthResponse {
 	@AllArgsConstructor
 	public class Obj {
 		
-		/** Power production for each day of the month */
-		private List<Double> energy;
-
+		private String epvToday;
+		private String epvTotal;
+		private String pac;
 	}
-	
 }

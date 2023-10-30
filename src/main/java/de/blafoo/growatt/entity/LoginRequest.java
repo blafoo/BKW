@@ -1,4 +1,4 @@
-package de.blafoo.bkw.growatt.entity;
+package de.blafoo.growatt.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
