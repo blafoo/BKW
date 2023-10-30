@@ -1,4 +1,4 @@
-package de.blafoo.growatt.entity;
+package de.blafoo.bkw.growatt.entity;
 
 import java.util.List;
 
@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthResponse {
+public class YearResponse {
 	
-	/** Status of query: 1 == ok */
 	private Long result;
-	
 	private Obj obj;
 
 	@Getter
@@ -21,7 +19,6 @@ public class MonthResponse {
 	@AllArgsConstructor
 	public class Obj {
 		
-		/** Power production for each day of the month */
 		private List<Double> energy;
 
 	}

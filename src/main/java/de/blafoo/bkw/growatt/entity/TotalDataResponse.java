@@ -1,4 +1,4 @@
-package de.blafoo.growatt.entity;
+package de.blafoo.bkw.growatt.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package de.blafoo.growatt.feign;
+package de.blafoo.bkw.growatt.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import de.blafoo.growatt.entity.DayResponse;
-import de.blafoo.growatt.entity.EnergyRequest;
-import de.blafoo.growatt.entity.LoginRequest;
-import de.blafoo.growatt.entity.MonthResponse;
-import de.blafoo.growatt.entity.TotalDataResponse;
-import de.blafoo.growatt.entity.YearResponse;
+import de.blafoo.bkw.growatt.entity.DayResponse;
+import de.blafoo.bkw.growatt.entity.EnergyRequest;
+import de.blafoo.bkw.growatt.entity.LoginRequest;
+import de.blafoo.bkw.growatt.entity.MonthResponse;
+import de.blafoo.bkw.growatt.entity.TotalDataResponse;
+import de.blafoo.bkw.growatt.entity.YearResponse;
 
 @FeignClient(name = "growatt-client", url = "http://server.growatt.com")
 public interface GrowattFeignClient {

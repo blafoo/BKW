@@ -1,4 +1,4 @@
-package de.blafoo.views.bkw;
+package de.blafoo.bkw.views.bkw;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -38,12 +38,12 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 
-import de.blafoo.growatt.entity.EnergyRequest;
-import de.blafoo.growatt.entity.LoginRequest;
-import de.blafoo.growatt.entity.TotalDataResponse;
-import de.blafoo.growatt.feign.GrowattFeignClient;
-import de.blafoo.growatt.feign.GrowattFeignCookieJar;
-import de.blafoo.views.MainLayout;
+import de.blafoo.bkw.growatt.entity.EnergyRequest;
+import de.blafoo.bkw.growatt.entity.LoginRequest;
+import de.blafoo.bkw.growatt.entity.TotalDataResponse;
+import de.blafoo.bkw.growatt.feign.GrowattFeignClient;
+import de.blafoo.bkw.growatt.feign.GrowattFeignCookieJar;
+import de.blafoo.bkw.views.MainLayout;
 
 @PageTitle("BKW")
 @Route(value = "bkw", layout = MainLayout.class)
