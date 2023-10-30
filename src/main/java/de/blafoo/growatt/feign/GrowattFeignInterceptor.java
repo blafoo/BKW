@@ -1,4 +1,4 @@
-package de.blafoo.bkw.growatt.feign;
+package de.blafoo.growatt.feign;
 
 import java.io.IOException;
 import java.util.List;

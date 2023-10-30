@@ -1,4 +1,4 @@
-package de.blafoo.bkw.growatt.entity;
+package de.blafoo.growatt.entity;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
