@@ -28,6 +28,18 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
+		<repository>
+			<id>github</id>
+			<name>GitHub blafoo Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/blafoo/growatt</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
     </repositories>
 
     <dependencyManagement>
