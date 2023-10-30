@@ -1,4 +1,4 @@
-package de.blafoo.views;
+package de.blafoo.bkw.views;
 
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
@@ -14,9 +14,9 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import de.blafoo.views.about.AboutView;
-import de.blafoo.views.bkw.BkwFeignView;
-import de.blafoo.views.bkw.BkwGrowattView;
+import de.blafoo.bkw.views.about.AboutView;
+import de.blafoo.bkw.views.bkw.BkwFeignView;
+import de.blafoo.bkw.views.bkw.BkwGrowattView;
 
 /**
  * The main view is a top-level placeholder for other views.

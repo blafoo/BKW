@@ -1,4 +1,4 @@
-package de.blafoo.views.bkw;
+package de.blafoo.bkw.views.bkw;
 
 import java.util.List;
 
@@ -10,11 +10,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
+import de.blafoo.bkw.views.MainLayout;
 import de.blafoo.growatt.controller.GrowattWebClient;
 import de.blafoo.growatt.entity.EnergyRequest;
 import de.blafoo.growatt.entity.LoginRequest;
 import de.blafoo.growatt.entity.TotalDataResponse;
-import de.blafoo.views.MainLayout;
 
 @PageTitle("BKW (Growatt)")
 @Route(value = "bkwgrowatt", layout = MainLayout.class)

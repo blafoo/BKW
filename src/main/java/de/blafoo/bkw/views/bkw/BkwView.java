@@ -1,4 +1,4 @@
-package de.blafoo.views.bkw;
+package de.blafoo.bkw.views.bkw;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
