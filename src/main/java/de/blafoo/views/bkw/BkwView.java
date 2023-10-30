@@ -1,13 +1,23 @@
 package de.blafoo.views.bkw;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.charts.Chart;
-import com.vaadin.flow.component.charts.model.*;
-import com.vaadin.flow.component.grid.ColumnTextAlign;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.charts.model.ChartType;
+import com.vaadin.flow.component.charts.model.Configuration;
+import com.vaadin.flow.component.charts.model.DataSeries;
+import com.vaadin.flow.component.charts.model.DataSeriesItem;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.html.Span;
@@ -17,7 +27,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -27,159 +37,213 @@ import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import de.blafoo.views.MainLayout;
-import de.blafoo.views.bkw.ServiceHealth.Status;
 
-@PageTitle("Bkw")
+import de.blafoo.growatt.entity.EnergyRequest;
+import de.blafoo.growatt.entity.LoginRequest;
+import de.blafoo.growatt.entity.TotalDataResponse;
+import de.blafoo.growatt.feign.GrowattFeignClient;
+import de.blafoo.growatt.feign.GrowattFeignCookieJar;
+import de.blafoo.views.MainLayout;
+
+@PageTitle("BKW")
 @Route(value = "bkw", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
 public class BkwView extends Main {
+	
+	private String account;
+	
+	private String password;
 
-    public BkwView() {
+	private GrowattFeignCookieJar cookieJar;
+	
+	private GrowattFeignClient growatt;
+	
+	private Select<String> yearSelect;
+	
+	private String month;
+	
+	private Chart yearChart;
+	
+    private Chart monthChart;
+    
+	public BkwView(@Autowired GrowattFeignClient growatt, @Autowired GrowattFeignCookieJar cookieJar, @Value("${growatt.account}") String account, @Value("${growatt.password}") String password) {
         addClassName("bkw-view");
+        
+        this.cookieJar = cookieJar;
+        this.growatt = growatt;
+        this.account = account;
+        this.password = password;
+        
+        String plantId = login();
+        var totalData = getTotalData(plantId);
+        
+    	yearSelect = new Select<>();
+        var gridYear = Integer.valueOf(totalData.getObj().getGridDate().split("-")[0]);
+        yearSelect.setItems(IntStream.range(gridYear, LocalDate.now().getYear()+1).mapToObj(String::valueOf).toList());
+        yearSelect.setValue(String.valueOf(LocalDate.now().getYear()));
 
+        double eTotal = totalData.getObj().getETotal(); 
         Board board = new Board();
-        board.addRow(createHighlight("Current users", "745", 33.7), createHighlight("View events", "54.6k", -112.45),
-                createHighlight("Conversion rate", "18%", 3.9), createHighlight("Custom metric", "-123.45", 0.0));
-        board.addRow(createViewEvents());
-        board.addRow(createServiceHealth(), createResponseTimes());
+        board.addRow(
+        		createHighlight("Yearly production", totalData.getObj().getETotal(), null), 
+        		createHighlight("Monthly production", totalData.getObj().getEMonth(), null),
+        		createHighlight("Daily production", totalData.getObj().getEToday(), eTotal / Double.valueOf(totalData.getObj().getRunDay())),
+        		createHighlight("Current production", totalData.getObj().getPac(), null)
+        		);
+        board.addRow(createYearlyOverview(plantId));
+        board.addRow(createMonthlyOverview(plantId), createDailyOverview(plantId));
+        
         add(board);
     }
 
-    private Component createHighlight(String title, String value, Double percentage) {
-        VaadinIcon icon = VaadinIcon.ARROW_UP;
-        String prefix = "";
-        String theme = "badge";
-
-        if (percentage == 0) {
-            prefix = "±";
-        } else if (percentage > 0) {
-            prefix = "+";
-            theme += " success";
-        } else if (percentage < 0) {
-            icon = VaadinIcon.ARROW_DOWN;
-            theme += " error";
-        }
+    private Component createHighlight(String title, Double value, Double average) {
+        VerticalLayout layout = new VerticalLayout();
+        layout.addClassName(Padding.SMALL);
+        layout.setPadding(false);
+        layout.setSpacing(false);
 
         H2 h2 = new H2(title);
         h2.addClassNames(FontWeight.NORMAL, Margin.NONE, TextColor.SECONDARY, FontSize.XSMALL);
+        layout.add(h2);
 
-        Span span = new Span(value);
+        HorizontalLayout hl = new HorizontalLayout();
+        layout.add(hl);
+        Span span = new Span(String.format("%.2f", value));
         span.addClassNames(FontWeight.SEMIBOLD, FontSize.XXXLARGE);
+        hl.add(span);
 
-        Icon i = icon.create();
-        i.addClassNames(BoxSizing.BORDER, Padding.XSMALL);
+        if (average != null) {
+        	VaadinIcon icon = VaadinIcon.ARROW_UP;
+            String prefix = "";
+            String theme = "badge";
 
-        Span badge = new Span(i, new Span(prefix + percentage.toString()));
-        badge.getElement().getThemeList().add(theme);
+            if (average == null || value == average) {
+            	icon = VaadinIcon.ARROW_RIGHT;
+                prefix = "±";
+            } else if (value > average) {
+                prefix = "+";
+                theme += " success";
+            } else {
+                icon = VaadinIcon.ARROW_DOWN;
+                theme += " error";
+            }
+	      
+            Icon i = icon.create();
+	        i.addClassNames(BoxSizing.BORDER, Padding.XSMALL);
+	
+	        Span badge = new Span(i, new Span(String.format("%s %.2f", prefix, average)));
+	        badge.getElement().getThemeList().add(theme);
+	        
+	        hl.add(badge);
+        }
 
-        VerticalLayout layout = new VerticalLayout(h2, span, badge);
-        layout.addClassName(Padding.LARGE);
-        layout.setPadding(false);
-        layout.setSpacing(false);
         return layout;
     }
 
-    private Component createViewEvents() {
-        // Header
-        Select year = new Select();
-        year.setItems("2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021");
-        year.setValue("2021");
-        year.setWidth("100px");
+    private Component createYearlyOverview(String plantId) {
+ 
+        HorizontalLayout header = createHeader("Yearly production", "kWh/month");
+        TextField user = new TextField();
+        user.setEnabled(false);
+        user.setValue(account);
+        header.add(user, yearSelect);
 
-        HorizontalLayout header = createHeader("View events", "City/month");
-        header.add(year);
-
-        // Chart
-        Chart chart = new Chart(ChartType.AREASPLINE);
-        Configuration conf = chart.getConfiguration();
+        yearChart = new Chart(ChartType.COLUMN);
+        Configuration conf = yearChart.getConfiguration();
         conf.getChart().setStyledMode(true);
 
-        XAxis xAxis = new XAxis();
-        xAxis.setCategories("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-        conf.addxAxis(xAxis);
+        String[] categories = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        conf.getxAxis().setCategories(categories);
+        conf.getyAxis().setTitle("kWh");
 
-        conf.getyAxis().setTitle("Values");
+        var yearlyProduction = getYearlyProduction(plantId, yearSelect.getValue());
+        
+        DataSeries series = new DataSeries(yearSelect.getValue());
+        for (int m = 1; m <= 12; m++) {
+        	DataSeriesItem monthItem = new DataSeriesItem(categories[m-1], yearlyProduction.get(m-1));
+            series.addItemWithDrilldown(monthItem);
+        }
+        conf.addSeries(series);
 
-        PlotOptionsAreaspline plotOptions = new PlotOptionsAreaspline();
-        plotOptions.setPointPlacement(PointPlacement.ON);
-        plotOptions.setMarker(new Marker(false));
-        conf.addPlotOptions(plotOptions);
-
-        conf.addSeries(new ListSeries("Berlin", 189, 191, 291, 396, 501, 403, 609, 712, 729, 942, 1044, 1247));
-        conf.addSeries(new ListSeries("London", 138, 246, 248, 348, 352, 353, 463, 573, 778, 779, 885, 887));
-        conf.addSeries(new ListSeries("New York", 65, 65, 166, 171, 293, 302, 308, 317, 427, 429, 535, 636));
-        conf.addSeries(new ListSeries("Tokyo", 0, 11, 17, 123, 130, 142, 248, 349, 452, 454, 458, 462));
-
-        // Add it all together
-        VerticalLayout viewEvents = new VerticalLayout(header, chart);
-        viewEvents.addClassName(Padding.LARGE);
+        VerticalLayout viewEvents = new VerticalLayout(header, yearChart);
+        viewEvents.addClassName(Padding.SMALL);
         viewEvents.setPadding(false);
         viewEvents.setSpacing(false);
         viewEvents.getElement().getThemeList().add("spacing-l");
         return viewEvents;
     }
+    
+    private Component createMonthlyOverview(String plantId) {
+    	
+        HorizontalLayout header = createHeader("Monthly production", "kWh/day");
 
-    private Component createServiceHealth() {
-        // Header
-        HorizontalLayout header = createHeader("Service health", "Input / output");
-
-        // Grid
-        Grid<ServiceHealth> grid = new Grid();
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setAllRowsVisible(true);
-
-        grid.addColumn(new ComponentRenderer<>(serviceHealth -> {
-            Span status = new Span();
-            String statusText = getStatusDisplayName(serviceHealth);
-            status.getElement().setAttribute("aria-label", "Status: " + statusText);
-            status.getElement().setAttribute("title", "Status: " + statusText);
-            status.getElement().getThemeList().add(getStatusTheme(serviceHealth));
-            return status;
-        })).setHeader("").setFlexGrow(0).setAutoWidth(true);
-        grid.addColumn(ServiceHealth::getCity).setHeader("City").setFlexGrow(1);
-        grid.addColumn(ServiceHealth::getInput).setHeader("Input").setAutoWidth(true).setTextAlign(ColumnTextAlign.END);
-        grid.addColumn(ServiceHealth::getOutput).setHeader("Output").setAutoWidth(true)
-                .setTextAlign(ColumnTextAlign.END);
-
-        grid.setItems(new ServiceHealth(Status.EXCELLENT, "Münster", 324, 1540),
-                new ServiceHealth(Status.OK, "Cluj-Napoca", 311, 1320),
-                new ServiceHealth(Status.FAILING, "Ciudad Victoria", 300, 1219));
-
-        // Add it all together
-        VerticalLayout serviceHealth = new VerticalLayout(header, grid);
-        serviceHealth.addClassName(Padding.LARGE);
-        serviceHealth.setPadding(false);
-        serviceHealth.setSpacing(false);
-        serviceHealth.getElement().getThemeList().add("spacing-l");
-        return serviceHealth;
-    }
-
-    private Component createResponseTimes() {
-        HorizontalLayout header = createHeader("Response times", "Average across all systems");
-
-        // Chart
-        Chart chart = new Chart(ChartType.PIE);
-        Configuration conf = chart.getConfiguration();
+        monthChart = new Chart(ChartType.COLUMN);
+        Configuration conf = monthChart.getConfiguration();
         conf.getChart().setStyledMode(true);
-        chart.setThemeName("gradient");
+        conf.getyAxis().setTitle("kWh");
 
-        DataSeries series = new DataSeries();
-        series.add(new DataSeriesItem("System 1", 12.5));
-        series.add(new DataSeriesItem("System 2", 12.5));
-        series.add(new DataSeriesItem("System 3", 12.5));
-        series.add(new DataSeriesItem("System 4", 12.5));
-        series.add(new DataSeriesItem("System 5", 12.5));
-        series.add(new DataSeriesItem("System 6", 12.5));
+        DataSeries series = new DataSeries("no month selected");
         conf.addSeries(series);
+        
+        yearChart.addDrilldownListener(dde -> {
+        	
+        	month = String.valueOf(dde.getItemIndex()+1);
+       	
+        	var monthlyProduction = getMonthlyProduction(plantId, String.format("%s-%s", yearSelect.getValue(), month));
+        	
+        	String[] categories = IntStream.range(1, monthlyProduction.size()+1).mapToObj(String::valueOf).toArray(String[]::new);
+            conf.getxAxis().setCategories(categories);
+        	
+        	DataSeries monthlyDrillDownSeries = new DataSeries(dde.getCategory());
+            for (int day = 1; day <= monthlyProduction.size(); day++) {
+             	monthlyDrillDownSeries.addItemWithDrilldown(new DataSeriesItem(String.valueOf(day), monthlyProduction.get(day-1)));
+            }
+            
+            monthChart.getConfiguration().setSeries(monthlyDrillDownSeries);
+            monthChart.drawChart();
+        });
+        
+        VerticalLayout viewEvents = new VerticalLayout(header, monthChart);
+        viewEvents.addClassName(Padding.SMALL);
+        viewEvents.setPadding(false);
+        viewEvents.setSpacing(false);
+        viewEvents.getElement().getThemeList().add("spacing-l");
+        return viewEvents;
+    }
+    
+    private Component createDailyOverview(String plantId) {
+        HorizontalLayout header = createHeader("Daily production", "kWh/5min");
 
-        // Add it all together
-        VerticalLayout serviceHealth = new VerticalLayout(header, chart);
-        serviceHealth.addClassName(Padding.LARGE);
-        serviceHealth.setPadding(false);
-        serviceHealth.setSpacing(false);
-        serviceHealth.getElement().getThemeList().add("spacing-l");
-        return serviceHealth;
+        Chart dayChart = new Chart(ChartType.LINE);
+        Configuration conf = dayChart.getConfiguration();
+        conf.getChart().setStyledMode(true);
+        
+        List<String> categories = new ArrayList<>();
+        IntStream.rangeClosed(0, 24*12 -1).forEach(i -> categories.add(LocalTime.ofSecondOfDay(i*5*60).format(DateTimeFormatter.ofPattern("HH:mm"))));
+        conf.getxAxis().setCategories(categories.toArray(new String[0]));
+        conf.getyAxis().setTitle("kWh");
+
+        DataSeries series = new DataSeries("no day selected");
+        conf.addSeries(series);
+        
+        monthChart.addDrilldownListener(dde -> {
+        	var dailyProduction = getDailyProduction(plantId, String.format("%s-%s-%s", yearSelect.getValue(), month, String.valueOf(dde.getItemIndex()+1)));
+        	
+        	DataSeries dailyDrillDownSeries = new DataSeries(dde.getCategory());
+            for (int day = 1; day <= dailyProduction.size(); day++) {
+            	dailyDrillDownSeries.add(new DataSeriesItem(String.valueOf(day), dailyProduction.get(day-1)));
+            }
+            
+            dayChart.getConfiguration().setSeries(dailyDrillDownSeries);
+            dayChart.drawChart();
+        });
+        
+        VerticalLayout viewEvents = new VerticalLayout(header, dayChart);
+        viewEvents.addClassName(Padding.SMALL);
+        viewEvents.setPadding(false);
+        viewEvents.setSpacing(false);
+        viewEvents.getElement().getThemeList().add("spacing-l");
+        return viewEvents;
     }
 
     private HorizontalLayout createHeader(String title, String subtitle) {
@@ -199,29 +263,27 @@ public class BkwView extends Main {
         header.setWidthFull();
         return header;
     }
-
-    private String getStatusDisplayName(ServiceHealth serviceHealth) {
-        Status status = serviceHealth.getStatus();
-        if (status == Status.OK) {
-            return "Ok";
-        } else if (status == Status.FAILING) {
-            return "Failing";
-        } else if (status == Status.EXCELLENT) {
-            return "Excellent";
-        } else {
-            return status.toString();
-        }
+    
+    private String login() {
+    	 growatt.login(new LoginRequest(account, password));
+    	 growatt.getBusiness();
+    	 return cookieJar.getCookie("onePlantId", null);
     }
-
-    private String getStatusTheme(ServiceHealth serviceHealth) {
-        Status status = serviceHealth.getStatus();
-        String theme = "badge primary small";
-        if (status == Status.EXCELLENT) {
-            theme += " success";
-        } else if (status == Status.FAILING) {
-            theme += " error";
-        }
-        return theme;
+    
+    private TotalDataResponse getTotalData(@NonNull String plantId) {
+    	return growatt.getTotalData(new EnergyRequest(plantId, null));
+    }
+    
+	private List<Double> getYearlyProduction(@NonNull String plantId, String date) {
+		return growatt.getInvEnergyYearChart(new EnergyRequest(plantId, date)).getObj().getEnergy();
+    }
+    
+    private List<Double> getMonthlyProduction(@NonNull String plantId, String date) {
+    	return growatt.getInvEnergyMonthChart(new EnergyRequest(plantId, date)).getObj().getEnergy();
+    }
+    
+    private List<Double> getDailyProduction(@NonNull String plantId, String date) {
+    	return growatt.getInvEnergyDayChart(new EnergyRequest(plantId, date)).getObj().getPac();
     }
 
 }
