@@ -55,7 +55,7 @@ public class MainLayout extends AppLayout {
         SideNav nav = new SideNav();
 
         nav.addItem(new SideNavItem("BKW (Feign)", BkwFeignView.class, LineAwesomeIcon.CHART_AREA_SOLID.create()));
-        nav.addItem(new SideNavItem("BKW (Growatt API)", BkwGrowattView.class, LineAwesomeIcon.CHART_AREA_SOLID.create()));
+        nav.addItem(new SideNavItem("BKW (Growatt)", BkwGrowattView.class, LineAwesomeIcon.CHART_AREA_SOLID.create()));
         nav.addItem(new SideNavItem("About", AboutView.class, LineAwesomeIcon.FILE.create()));
 
         return nav;

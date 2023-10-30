@@ -1,4 +1,4 @@
-package de.blafoo.bkw.growatt.feign;
+package de.blafoo.growatt.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;

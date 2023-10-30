@@ -1,4 +1,4 @@
-package de.blafoo.bkw;
+package de.blafoo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,10 +17,10 @@ import com.vaadin.flow.theme.Theme;
 @EnableFeignClients
 @SpringBootApplication
 @Theme(value = "bkw")
-public class Application implements AppShellConfigurator {
+public class BKWApplication implements AppShellConfigurator {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(BKWApplication.class, args);
     }
 
 }

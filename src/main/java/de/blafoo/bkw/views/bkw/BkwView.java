@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 import com.vaadin.flow.component.Component;
@@ -51,6 +52,9 @@ abstract class BkwView extends Main {
     private Chart monthChart;
     
 	public BkwView(String account, String password) {
+		if ( StringUtils.isBlank(account) || StringUtils.isBlank(password) )
+			throw new IllegalArgumentException("account and password must not be empty - add them to the application.properites");
+		
         this.account = account;
         this.password = password;
 	}
