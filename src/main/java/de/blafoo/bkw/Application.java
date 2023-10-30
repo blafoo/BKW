@@ -1,4 +1,4 @@
-package de.blafoo;
+package de.blafoo.bkw;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;

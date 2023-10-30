@@ -1,4 +1,4 @@
-package de.blafoo.views.about;
+package de.blafoo.bkw.views.about;
 
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -7,7 +7,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
-import de.blafoo.views.MainLayout;
+
+import de.blafoo.bkw.views.MainLayout;
 
 @PageTitle("About")
 @Route(value = "about", layout = MainLayout.class)

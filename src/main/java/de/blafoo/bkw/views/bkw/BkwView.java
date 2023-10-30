@@ -1,10 +1,18 @@
-package de.blafoo.views.bkw;
+package de.blafoo.bkw.views.bkw;
 
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.charts.Chart;
-import com.vaadin.flow.component.charts.model.*;
+import com.vaadin.flow.component.charts.model.ChartType;
+import com.vaadin.flow.component.charts.model.Configuration;
+import com.vaadin.flow.component.charts.model.DataSeries;
+import com.vaadin.flow.component.charts.model.DataSeriesItem;
+import com.vaadin.flow.component.charts.model.ListSeries;
+import com.vaadin.flow.component.charts.model.Marker;
+import com.vaadin.flow.component.charts.model.PlotOptionsAreaspline;
+import com.vaadin.flow.component.charts.model.PointPlacement;
+import com.vaadin.flow.component.charts.model.XAxis;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -27,8 +35,9 @@ import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import de.blafoo.views.MainLayout;
-import de.blafoo.views.bkw.ServiceHealth.Status;
+
+import de.blafoo.bkw.views.MainLayout;
+import de.blafoo.bkw.views.bkw.ServiceHealth.Status;
 
 @PageTitle("Bkw")
 @Route(value = "bkw", layout = MainLayout.class)
