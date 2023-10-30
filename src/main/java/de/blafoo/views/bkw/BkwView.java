@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 
 import com.vaadin.flow.component.Component;
@@ -28,9 +26,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.theme.lumo.LumoUtility.BoxSizing;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
@@ -38,25 +33,14 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 
-import de.blafoo.growatt.entity.EnergyRequest;
-import de.blafoo.growatt.entity.LoginRequest;
 import de.blafoo.growatt.entity.TotalDataResponse;
-import de.blafoo.growatt.feign.GrowattFeignClient;
-import de.blafoo.growatt.feign.GrowattFeignCookieJar;
-import de.blafoo.views.MainLayout;
+import jakarta.annotation.PostConstruct;
 
-@PageTitle("BKW")
-@Route(value = "bkw", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
-public class BkwView extends Main {
+abstract class BkwView extends Main {
 	
-	private String account;
+	protected String account;
 	
-	private String password;
-
-	private GrowattFeignCookieJar cookieJar;
-	
-	private GrowattFeignClient growatt;
+	protected String password;
 	
 	private Select<String> yearSelect;
 	
@@ -66,13 +50,14 @@ public class BkwView extends Main {
 	
     private Chart monthChart;
     
-	public BkwView(@Autowired GrowattFeignClient growatt, @Autowired GrowattFeignCookieJar cookieJar, @Value("${growatt.account}") String account, @Value("${growatt.password}") String password) {
-        addClassName("bkw-view");
-        
-        this.cookieJar = cookieJar;
-        this.growatt = growatt;
+	public BkwView(String account, String password) {
         this.account = account;
         this.password = password;
+	}
+
+	@PostConstruct
+	protected void init() {
+        addClassName("bkw-view");
         
         String plantId = login();
         var totalData = getTotalData(plantId);
@@ -264,26 +249,14 @@ public class BkwView extends Main {
         return header;
     }
     
-    private String login() {
-    	 growatt.login(new LoginRequest(account, password));
-    	 growatt.getBusiness();
-    	 return cookieJar.getCookie("onePlantId", null);
-    }
+    protected abstract String login();
     
-    private TotalDataResponse getTotalData(@NonNull String plantId) {
-    	return growatt.getTotalData(new EnergyRequest(plantId, null));
-    }
+    protected abstract TotalDataResponse getTotalData(@NonNull String plantId);
     
-	private List<Double> getYearlyProduction(@NonNull String plantId, String date) {
-		return growatt.getInvEnergyYearChart(new EnergyRequest(plantId, date)).getObj().getEnergy();
-    }
+    protected abstract List<Double> getYearlyProduction(@NonNull String plantId, String date);
     
-    private List<Double> getMonthlyProduction(@NonNull String plantId, String date) {
-    	return growatt.getInvEnergyMonthChart(new EnergyRequest(plantId, date)).getObj().getEnergy();
-    }
+    protected abstract List<Double> getMonthlyProduction(@NonNull String plantId, String date);
     
-    private List<Double> getDailyProduction(@NonNull String plantId, String date) {
-    	return growatt.getInvEnergyDayChart(new EnergyRequest(plantId, date)).getObj().getPac();
-    }
+    protected abstract List<Double> getDailyProduction(@NonNull String plantId, String date);
 
 }

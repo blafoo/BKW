@@ -1,5 +1,7 @@
 package de.blafoo.views;
 
+import org.vaadin.lineawesome.LineAwesomeIcon;
+
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.Footer;
@@ -11,9 +13,10 @@ import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import de.blafoo.views.about.AboutView;
-import de.blafoo.views.bkw.BkwView;
-import org.vaadin.lineawesome.LineAwesomeIcon;
+import de.blafoo.views.bkw.BkwFeignView;
+import de.blafoo.views.bkw.BkwGrowattView;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -51,7 +54,8 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        nav.addItem(new SideNavItem("Bkw", BkwView.class, LineAwesomeIcon.CHART_AREA_SOLID.create()));
+        nav.addItem(new SideNavItem("BKW (Feign)", BkwFeignView.class, LineAwesomeIcon.CHART_AREA_SOLID.create()));
+        nav.addItem(new SideNavItem("BKW (Growatt)", BkwGrowattView.class, LineAwesomeIcon.CHART_AREA_SOLID.create()));
         nav.addItem(new SideNavItem("About", AboutView.class, LineAwesomeIcon.FILE.create()));
 
         return nav;
