@@ -1,4 +1,4 @@
-package de.blafoo;
+package de.blafoo.bkw;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

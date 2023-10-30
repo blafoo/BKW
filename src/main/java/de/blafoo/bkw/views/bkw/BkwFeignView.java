@@ -1,4 +1,4 @@
-package de.blafoo.views.bkw;
+package de.blafoo.bkw.views.bkw;
 
 import java.util.List;
 
@@ -9,12 +9,12 @@ import org.springframework.lang.NonNull;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import de.blafoo.bkw.growatt.feign.GrowattFeignClient;
+import de.blafoo.bkw.growatt.feign.GrowattFeignCookieJar;
+import de.blafoo.bkw.views.MainLayout;
 import de.blafoo.growatt.entity.EnergyRequest;
 import de.blafoo.growatt.entity.LoginRequest;
 import de.blafoo.growatt.entity.TotalDataResponse;
-import de.blafoo.growatt.feign.GrowattFeignClient;
-import de.blafoo.growatt.feign.GrowattFeignCookieJar;
-import de.blafoo.views.MainLayout;
 
 @PageTitle("BKW (Feign)")
 @Route(value = "bkwfeign", layout = MainLayout.class)
