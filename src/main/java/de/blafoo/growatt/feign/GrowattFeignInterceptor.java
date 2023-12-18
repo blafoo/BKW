@@ -1,6 +1,5 @@
 package de.blafoo.growatt.feign;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +28,7 @@ public class GrowattFeignInterceptor implements RequestInterceptor, ResponseInte
 	}
 	
 	@Override
-	public Object aroundDecode(InvocationContext invocationContext) throws IOException {
+	public Object intercept(InvocationContext invocationContext, Chain chain) throws Exception {
 		feign.Response response = invocationContext.response();
 		var cookies = response.headers().get(HttpHeaders.SET_COOKIE);
 		cookieJar.addCookies(cookies);
