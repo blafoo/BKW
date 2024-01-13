@@ -1,3 +1,5 @@
+[![Java CI with Maven](https://github.com/blafoo/BKW/actions/workflows/maven.yml/badge.svg)](https://github.com/blafoo/BKW/actions/workflows/maven.yml)
+
 # BKW
 
 App to visualize the data from server.growatt.com for Growatt inverters
