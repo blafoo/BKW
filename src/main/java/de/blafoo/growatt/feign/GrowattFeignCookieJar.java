@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class GrowattFeignCookieJar {
 	
-	Map<String, String> cookies = new HashMap<>();
+	private Map<String, String> cookies = new HashMap<>();
 
 	public String getCookie(String cookie, String defaultValue) {
 		return cookies.getOrDefault(cookie, defaultValue);

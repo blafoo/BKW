@@ -16,6 +16,7 @@ import de.blafoo.growatt.entity.TotalDataResponse;
 import de.blafoo.growatt.feign.GrowattFeignClient;
 import de.blafoo.growatt.feign.GrowattFeignCookieJar;
 
+@SuppressWarnings("serial")
 @PageTitle("BKW (Feign)")
 @Route(value = "bkwfeign", layout = MainLayout.class)
 public class BkwFeignView extends BkwView {
@@ -40,7 +41,7 @@ public class BkwFeignView extends BkwView {
     
     @Override
     protected TotalDataResponse getTotalData(@NonNull String plantId) {
-    	return growatt.getTotalData(new EnergyRequest(plantId, null));
+    	return growatt.getTotalData(new EnergyRequest(plantId));
     }
     
 	@Override

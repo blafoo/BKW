@@ -16,6 +16,7 @@ import de.blafoo.growatt.entity.EnergyRequest;
 import de.blafoo.growatt.entity.LoginRequest;
 import de.blafoo.growatt.entity.TotalDataResponse;
 
+@SuppressWarnings("serial")
 @PageTitle("BKW (Growatt)")
 @Route(value = "bkwgrowatt", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
@@ -37,7 +38,7 @@ public class BkwGrowattView extends BkwView {
     
     @Override
     protected TotalDataResponse getTotalData(@NonNull String plantId) {
-    	return growatt.getTotalData(new EnergyRequest(plantId, null));
+    	return growatt.getTotalData(new EnergyRequest(plantId));
     }
     
 	@Override

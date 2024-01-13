@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.ChartType;
@@ -27,6 +28,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.theme.lumo.LumoUtility.BoxSizing;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
@@ -37,11 +41,17 @@ import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import de.blafoo.growatt.entity.TotalDataResponse;
 import jakarta.annotation.PostConstruct;
 
-abstract class BkwView extends Main {
+@SuppressWarnings("serial")
+@PreserveOnRefresh
+abstract class BkwView extends Main implements AfterNavigationObserver {
 	
 	protected String account;
 	
 	protected String password;
+	
+	private String plantId;
+
+	private TotalDataResponse totalData;
 	
 	private Select<String> yearSelect;
 	
@@ -50,7 +60,7 @@ abstract class BkwView extends Main {
 	private Chart yearChart;
 	
     private Chart monthChart;
-    
+
 	public BkwView(String account, String password) {
 		if ( StringUtils.isBlank(account) || StringUtils.isBlank(password) )
 			throw new IllegalArgumentException("account and password must not be empty - add them to the application.properites");
@@ -63,18 +73,24 @@ abstract class BkwView extends Main {
 	protected void init() {
         addClassName("bkw-view");
         
-        String plantId = login();
-        var totalData = getTotalData(plantId);
+        plantId = login();
+        totalData = getTotalData(plantId);
         
     	yearSelect = new Select<>();
         var gridYear = Integer.valueOf(totalData.getObj().getGridDate().split("-")[0]);
         yearSelect.setItems(IntStream.range(gridYear, LocalDate.now().getYear()+1).mapToObj(String::valueOf).toList());
         yearSelect.setValue(String.valueOf(LocalDate.now().getYear()));
+        yearSelect.addValueChangeListener(e -> UI.getCurrent().navigate(this.getClass()));
+	}
+	
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+		this.removeAll();
 
         double eTotal = totalData.getObj().getETotal(); 
         Board board = new Board();
         board.addRow(
-        		createHighlight("Yearly production", totalData.getObj().getETotal(), null), 
+        		createHighlight("Total production", totalData.getObj().getETotal(), null), 
         		createHighlight("Monthly production", totalData.getObj().getEMonth(), null),
         		createHighlight("Daily production", totalData.getObj().getEToday(), eTotal / Double.valueOf(totalData.getObj().getRunDay())),
         		createHighlight("Current production", totalData.getObj().getPac(), null)
