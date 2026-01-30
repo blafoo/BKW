@@ -83,7 +83,6 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
 	public void afterNavigation(AfterNavigationEvent event) {
 		this.removeAll();
 
-        double eTotal = totalData.getObj().getDatas().getFirst().getETotal();
         Board board = new Board();
         board.addRow(
         		createHighlight("Total production", totalData.getObj().getDatas().getFirst().getETotal(), null),
