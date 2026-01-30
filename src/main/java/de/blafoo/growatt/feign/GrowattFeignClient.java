@@ -1,8 +1,8 @@
 package de.blafoo.growatt.feign;
 
 import de.blafoo.growatt.entity.DayResponse;
+import de.blafoo.growatt.entity.DevicesResponse;
 import de.blafoo.growatt.entity.MonthResponse;
-import de.blafoo.growatt.entity.TotalDataResponse;
 import de.blafoo.growatt.entity.YearResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -14,10 +14,13 @@ public interface GrowattFeignClient {
 	
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	String login(@RequestBody String userPassword);
-	
-	@PostMapping(value = "/indexbC/getTotalData", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	TotalDataResponse getTotalData(@RequestBody String request);
-	
+
+	@PostMapping(value = "/panel/getDevicesByPlantList", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	DevicesResponse getDevicesByPlantList(@RequestBody String request);
+
+	@PostMapping(value = "/energy/compare/getDevicesTotalChart", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	YearResponse getEnergyTotalChart(@RequestBody String request);
+
 	@PostMapping(value = "/energy/compare/getDevicesYearChart", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	YearResponse getEnergyYearChart(@RequestBody String request);
 

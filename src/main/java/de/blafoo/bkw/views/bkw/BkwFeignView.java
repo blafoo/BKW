@@ -4,7 +4,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blafoo.bkw.views.MainLayout;
 import de.blafoo.growatt.controller.GrowattWebClient;
-import de.blafoo.growatt.entity.TotalDataResponse;
+import de.blafoo.growatt.entity.DevicesResponse;
+import de.blafoo.growatt.entity.YearResponse;
 import de.blafoo.growatt.feign.GrowattFeignClient;
 import de.blafoo.growatt.feign.GrowattFeignCookieJar;
 import de.blafoo.growatt.md5.MD5;
@@ -34,9 +35,9 @@ public class BkwFeignView extends BkwView {
     }
 
     private String createBody(@NonNull String plantId, @Nullable String date, @Nullable Integer year, @Nullable String params) {
-        var map = GrowattWebClient.createBody(plantId, date, year, params);
+        var payload = GrowattWebClient.createBody(plantId, date, year, params);
         return UriComponentsBuilder.newInstance()
-                .queryParams(map)
+                .queryParams(payload)
                 .build()
                 .encode()
                 .getQuery();
@@ -47,12 +48,18 @@ public class BkwFeignView extends BkwView {
     	growatt.login("account=%s&passwordCrc=%s".formatted(account, MD5.md5(password)));
         return cookieJar.getCookie("onePlantId", null);
     }
-    
+
     @Override
-    protected TotalDataResponse getTotalData(@NonNull String plantId) {
-    	return growatt.getTotalData(createBody(plantId, null, null, ""));
+    protected DevicesResponse getDevicesByPlantList(@NonNull String plantId) {
+        return growatt.getDevicesByPlantList("currPage=%s&plantId=%s".formatted("1", plantId));
     }
-    
+
+    @Override
+    protected YearResponse getEnergyTotalChart(@NonNull String plantId, int lastYear) {
+        return growatt.getEnergyTotalChart(createBody(plantId, null, lastYear, "energy,autoEnergy"));
+    }
+
+
 	@Override
 	protected List<Double> getYearlyProduction(@NonNull String plantId, int year) {
 		return growatt.getEnergyYearChart(createBody(plantId, null, year, "")).getObj().getFirst().getDatas().getEnergy();

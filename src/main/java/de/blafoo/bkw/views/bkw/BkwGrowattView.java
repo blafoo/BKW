@@ -5,7 +5,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import de.blafoo.bkw.views.MainLayout;
 import de.blafoo.growatt.controller.GrowattWebClient;
-import de.blafoo.growatt.entity.TotalDataResponse;
+import de.blafoo.growatt.entity.DevicesResponse;
+import de.blafoo.growatt.entity.YearResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
@@ -31,13 +32,18 @@ public class BkwGrowattView extends BkwView {
 		growatt.login(account, password);
         return growatt.getPlantId();
     }
-    
+
     @Override
-    protected TotalDataResponse getTotalData(@NonNull String plantId) {
-    	return growatt.getTotalData(plantId);
+    protected DevicesResponse getDevicesByPlantList(@NonNull String plantId) {
+        return growatt.getDevicesByPlantList(plantId);
     }
-    
-	@Override
+
+    @Override
+    protected YearResponse getEnergyTotalChart(@NonNull String plantId, int year) {
+        return growatt.getEnergyTotalChart(plantId, year);
+    }
+
+    @Override
 	protected List<Double> getYearlyProduction(@NonNull String plantId, int year) {
 		return growatt.getEnergyYearChart(plantId, year).getObj().getFirst().getDatas().getEnergy();
     }

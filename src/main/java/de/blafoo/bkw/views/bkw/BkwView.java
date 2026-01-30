@@ -22,7 +22,8 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.theme.lumo.LumoUtility.*;
-import de.blafoo.growatt.entity.TotalDataResponse;
+import de.blafoo.growatt.entity.DevicesResponse;
+import de.blafoo.growatt.entity.YearResponse;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -43,7 +44,7 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
 	
 	private String plantId;
 
-	private TotalDataResponse totalData;
+	private DevicesResponse totalData;
 	
 	private Select<Integer> yearSelect;
 	
@@ -64,14 +65,17 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
 	@PostConstruct
 	protected void init() {
         addClassName("bkw-view");
+        int thisYear = LocalDate.now().getYear();
         
         plantId = login();
-        totalData = getTotalData(plantId);
+
+        totalData = getDevicesByPlantList(plantId);
+        YearResponse years = getEnergyTotalChart(plantId, thisYear);
+        long yearsWithProduction = years.getObj().getFirst().getDatas().getEnergy().stream().filter(energy -> energy > 0).count();
         
-    	int gridYear = Integer.parseInt(totalData.getObj().getGridDate().split("-")[0]);
         yearSelect = new Select<>();
-        yearSelect.setItems(IntStream.range(gridYear, LocalDate.now().getYear()+1).boxed().toList());
-        yearSelect.setValue(LocalDate.now().getYear());
+        yearSelect.setItems(IntStream.range(thisYear-(int)yearsWithProduction+1, thisYear+1).boxed().toList());
+        yearSelect.setValue(thisYear);
         yearSelect.addValueChangeListener(e -> UI.getCurrent().navigate(this.getClass()));
 	}
 	
@@ -79,13 +83,13 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
 	public void afterNavigation(AfterNavigationEvent event) {
 		this.removeAll();
 
-        double eTotal = totalData.getObj().getETotal(); 
+        double eTotal = totalData.getObj().getDatas().getFirst().getETotal();
         Board board = new Board();
         board.addRow(
-        		createHighlight("Total production", totalData.getObj().getETotal(), null), 
-        		createHighlight("Monthly production", totalData.getObj().getEMonth(), null),
-        		createHighlight("Daily production", totalData.getObj().getEToday(), eTotal / Double.valueOf(totalData.getObj().getRunDay())),
-        		createHighlight("Current production", totalData.getObj().getPac(), null)
+        		createHighlight("Total production", totalData.getObj().getDatas().getFirst().getETotal(), null),
+        		createHighlight("Monthly production", totalData.getObj().getDatas().getFirst().getEMonth(), null),
+        		createHighlight("Daily production", totalData.getObj().getDatas().getFirst().getEToday(), null),
+        		createHighlight("Current production", totalData.getObj().getDatas().getFirst().getPac(), null)
         		);
         board.addRow(createYearlyOverview(plantId));
         board.addRow(createMonthlyOverview(plantId), createDailyOverview(plantId));
@@ -262,9 +266,11 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
     }
     
     protected abstract String login();
-    
-    protected abstract TotalDataResponse getTotalData(@NonNull String plantId);
-    
+
+    protected abstract DevicesResponse getDevicesByPlantList(@NonNull String plantId);
+
+    protected abstract YearResponse getEnergyTotalChart(@NonNull String plantId, int year);
+
     protected abstract List<Double> getYearlyProduction(@NonNull String plantId, int year);
     
     protected abstract List<Double> getMonthlyProduction(@NonNull String plantId, LocalDate date);
