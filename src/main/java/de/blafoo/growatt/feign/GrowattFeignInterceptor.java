@@ -1,7 +1,9 @@
 package de.blafoo.growatt.feign;
 
-import java.util.List;
-
+import feign.InvocationContext;
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import feign.ResponseInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -11,10 +13,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
-import feign.InvocationContext;
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
-import feign.ResponseInterceptor;
+import java.util.Collection;
+import java.util.List;
 
 @Configuration
 public class GrowattFeignInterceptor implements RequestInterceptor, ResponseInterceptor {
@@ -29,12 +29,14 @@ public class GrowattFeignInterceptor implements RequestInterceptor, ResponseInte
 	
 	@Override
 	public Object intercept(InvocationContext invocationContext, Chain chain) throws Exception {
-		feign.Response response = invocationContext.response();
-		var cookies = response.headers().get(HttpHeaders.SET_COOKIE);
-		cookieJar.addCookies(cookies);
+        try (feign.Response response = invocationContext.response()) {
+			Collection<String> cookies = response.headers().get(HttpHeaders.SET_COOKIE);
+			if (cookies != null)
+				cookieJar.addCookies(cookies);
 
-        return invocationContext.proceed();
-	}
+			return invocationContext.proceed();
+        }
+    }
 
     @Bean
     HttpMessageConverters customConverters() {

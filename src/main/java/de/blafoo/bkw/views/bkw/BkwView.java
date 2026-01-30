@@ -1,15 +1,5 @@
 package de.blafoo.bkw.views.bkw;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.board.Board;
@@ -31,17 +21,19 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PreserveOnRefresh;
-import com.vaadin.flow.theme.lumo.LumoUtility.BoxSizing;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
-import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-
+import com.vaadin.flow.theme.lumo.LumoUtility.*;
 import de.blafoo.growatt.entity.TotalDataResponse;
 import jakarta.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
 
-@SuppressWarnings("serial")
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
 @PreserveOnRefresh
 abstract class BkwView extends Main implements AfterNavigationObserver {
 	
@@ -53,9 +45,9 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
 
 	private TotalDataResponse totalData;
 	
-	private Select<String> yearSelect;
+	private Select<Integer> yearSelect;
 	
-	private String month;
+	private Integer month;
 	
 	private Chart yearChart;
 	
@@ -76,10 +68,10 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
         plantId = login();
         totalData = getTotalData(plantId);
         
-    	yearSelect = new Select<>();
-        var gridYear = Integer.valueOf(totalData.getObj().getGridDate().split("-")[0]);
-        yearSelect.setItems(IntStream.range(gridYear, LocalDate.now().getYear()+1).mapToObj(String::valueOf).toList());
-        yearSelect.setValue(String.valueOf(LocalDate.now().getYear()));
+    	int gridYear = Integer.parseInt(totalData.getObj().getGridDate().split("-")[0]);
+        yearSelect = new Select<>();
+        yearSelect.setItems(IntStream.range(gridYear, LocalDate.now().getYear()+1).boxed().toList());
+        yearSelect.setValue(LocalDate.now().getYear());
         yearSelect.addValueChangeListener(e -> UI.getCurrent().navigate(this.getClass()));
 	}
 	
@@ -163,7 +155,7 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
 
         var yearlyProduction = getYearlyProduction(plantId, yearSelect.getValue());
         
-        DataSeries series = new DataSeries(yearSelect.getValue());
+        DataSeries series = new DataSeries(String.valueOf(yearSelect.getValue()));
         for (int m = 1; m <= 12; m++) {
         	DataSeriesItem monthItem = new DataSeriesItem(categories[m-1], yearlyProduction.get(m-1));
             series.addItemWithDrilldown(monthItem);
@@ -192,9 +184,9 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
         
         yearChart.addDrilldownListener(dde -> {
         	
-        	month = String.valueOf(dde.getItemIndex()+1);
+        	month = dde.getItemIndex()+1;
        	
-        	var monthlyProduction = getMonthlyProduction(plantId, String.format("%s-%s", yearSelect.getValue(), month));
+        	var monthlyProduction = getMonthlyProduction(plantId, LocalDate.of(yearSelect.getValue(), month, 1));
         	
         	String[] categories = IntStream.range(1, monthlyProduction.size()+1).mapToObj(String::valueOf).toArray(String[]::new);
             conf.getxAxis().setCategories(categories);
@@ -232,7 +224,7 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
         conf.addSeries(series);
         
         monthChart.addDrilldownListener(dde -> {
-        	var dailyProduction = getDailyProduction(plantId, String.format("%s-%s-%s", yearSelect.getValue(), month, String.valueOf(dde.getItemIndex()+1)));
+        	var dailyProduction = getDailyProduction(plantId, LocalDate.of(yearSelect.getValue(), month, dde.getItemIndex() + 1));
         	
         	DataSeries dailyDrillDownSeries = new DataSeries(dde.getCategory());
             for (int day = 1; day <= dailyProduction.size(); day++) {
@@ -273,10 +265,10 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
     
     protected abstract TotalDataResponse getTotalData(@NonNull String plantId);
     
-    protected abstract List<Double> getYearlyProduction(@NonNull String plantId, String date);
+    protected abstract List<Double> getYearlyProduction(@NonNull String plantId, int year);
     
-    protected abstract List<Double> getMonthlyProduction(@NonNull String plantId, String date);
+    protected abstract List<Double> getMonthlyProduction(@NonNull String plantId, LocalDate date);
     
-    protected abstract List<Double> getDailyProduction(@NonNull String plantId, String date);
+    protected abstract List<Double> getDailyProduction(@NonNull String plantId, LocalDate date);
 
 }
