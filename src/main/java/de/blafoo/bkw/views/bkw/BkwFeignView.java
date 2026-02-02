@@ -9,10 +9,9 @@ import de.blafoo.growatt.entity.YearResponse;
 import de.blafoo.growatt.feign.GrowattFeignClient;
 import de.blafoo.growatt.feign.GrowattFeignCookieJar;
 import de.blafoo.growatt.md5.MD5;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
@@ -27,7 +26,7 @@ public class BkwFeignView extends BkwView {
 	
 	private final GrowattFeignClient growatt;
 	
-	public BkwFeignView(@Autowired GrowattFeignClient growatt, @Autowired GrowattFeignCookieJar cookieJar, @Value("${growatt.account}") String account, @Value("${growatt.password}") String password) {
+	public BkwFeignView(GrowattFeignClient growatt, GrowattFeignCookieJar cookieJar, @Value("${growatt.account}") String account, @Value("${growatt.password}") String password) {
         super(account, password);
         
         this.cookieJar = cookieJar;

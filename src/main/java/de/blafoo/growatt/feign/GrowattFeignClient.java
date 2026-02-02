@@ -1,9 +1,6 @@
 package de.blafoo.growatt.feign;
 
-import de.blafoo.growatt.entity.DayResponse;
-import de.blafoo.growatt.entity.DevicesResponse;
-import de.blafoo.growatt.entity.MonthResponse;
-import de.blafoo.growatt.entity.YearResponse;
+import de.blafoo.growatt.entity.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface GrowattFeignClient {
 	
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	String login(@RequestBody String userPassword);
+	ResultResponse login(@RequestBody String userPassword);
 
 	@PostMapping(value = "/panel/getDevicesByPlantList", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	DevicesResponse getDevicesByPlantList(@RequestBody String request);

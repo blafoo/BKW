@@ -26,7 +26,7 @@ import de.blafoo.growatt.entity.DevicesResponse;
 import de.blafoo.growatt.entity.YearResponse;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -108,7 +108,7 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
 
         HorizontalLayout hl = new HorizontalLayout();
         layout.add(hl);
-        Span span = new Span(String.format("%.2f", value));
+        Span span = new Span("%.2f".formatted(value));
         span.addClassNames(FontWeight.SEMIBOLD, FontSize.XXXLARGE);
         hl.add(span);
 
@@ -131,7 +131,7 @@ abstract class BkwView extends Main implements AfterNavigationObserver {
             Icon i = icon.create();
 	        i.addClassNames(BoxSizing.BORDER, Padding.XSMALL);
 	
-	        Span badge = new Span(i, new Span(String.format("%s %.2f", prefix, average)));
+	        Span badge = new Span(i, new Span("%s %.2f".formatted(prefix, average)));
 	        badge.getElement().getThemeList().add(theme);
 	        
 	        hl.add(badge);

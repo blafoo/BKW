@@ -1,21 +1,17 @@
 package de.blafoo.growatt.feign;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class GrowattFeignCookieJar {
 	
-	private Map<String, String> cookies = new HashMap<>();
+	private final Map<String, String> cookies = new HashMap<>();
 
 	public String getCookie(String cookie, String defaultValue) {
 		return cookies.getOrDefault(cookie, defaultValue);
@@ -23,7 +19,7 @@ public class GrowattFeignCookieJar {
 	
 	public Collection<String> getCookies() {
 		List<String> result = new ArrayList<>();
-		cookies.forEach((k,v) -> result.add(String.format("%s=%s", k, v)));
+		cookies.forEach((k,v) -> result.add("%s=%s".formatted(k, v)));
 		return result;
 	}
 	

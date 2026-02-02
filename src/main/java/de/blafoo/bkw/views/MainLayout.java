@@ -1,7 +1,5 @@
 package de.blafoo.bkw.views;
 
-import org.vaadin.lineawesome.LineAwesomeIcon;
-
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.Footer;
@@ -11,17 +9,19 @@ import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-
 import de.blafoo.bkw.views.about.AboutView;
 import de.blafoo.bkw.views.bkw.BkwFeignView;
 import de.blafoo.bkw.views.bkw.BkwGrowattView;
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
-public class MainLayout extends AppLayout {
+public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     private H2 viewTitle;
 
@@ -62,14 +62,11 @@ public class MainLayout extends AppLayout {
     }
 
     private Footer createFooter() {
-        Footer layout = new Footer();
-
-        return layout;
+        return new Footer();
     }
 
     @Override
-    protected void afterNavigation() {
-        super.afterNavigation();
+    public void afterNavigation(AfterNavigationEvent afterNavigationEvent) {
         viewTitle.setText(getCurrentPageTitle());
     }
 
@@ -77,4 +74,5 @@ public class MainLayout extends AppLayout {
         PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
         return title == null ? "" : title.value();
     }
+
 }

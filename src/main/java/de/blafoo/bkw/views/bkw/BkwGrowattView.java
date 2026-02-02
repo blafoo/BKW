@@ -7,9 +7,8 @@ import de.blafoo.bkw.views.MainLayout;
 import de.blafoo.growatt.controller.GrowattWebClient;
 import de.blafoo.growatt.entity.DevicesResponse;
 import de.blafoo.growatt.entity.YearResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,7 +20,7 @@ public class BkwGrowattView extends BkwView {
 	
 	private final GrowattWebClient growatt;
 	
-	public BkwGrowattView(@Autowired GrowattWebClient growatt, @Value("${growatt.account}") String account, @Value("${growatt.password}") String password) {
+	public BkwGrowattView(GrowattWebClient growatt, @Value("${growatt.account}") String account, @Value("${growatt.password}") String password) {
         super(account, password);
         
         this.growatt = growatt;
