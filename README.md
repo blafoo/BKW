@@ -11,8 +11,8 @@ App to visualize the data from server.growatt.com for Growatt inverters
 
 ## Dependencies
 
-1. Spring Boot 3+
-1. Vaadin 24+ for the UI
+1. Spring Boot 4+
+1. Vaadin 25+ for the UI
 1. [`Growatt API`](https://github.com/blafoo/growatt) to access server.growatt.com
 
 ## Remarks
